@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Travis build
+status](https://travis-ci.org/jolars/pengen.svg?branch=master)](https://travis-ci.org/jolars/pengen)
 <!-- badges: end -->
 
 The goal of pengen is to provide an extensible framework for prototyping
