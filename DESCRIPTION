@@ -18,3 +18,5 @@ URL: https://github.com/jolars/pengen
 BugReports: https://github.com/jolars/pengen/issues
 Suggests: 
     covr
+RoxygenNote: 6.1.1
+Roxygen: list(markdown = TRUE)
