@@ -14,3 +14,5 @@ Description: Provides infrastructure for quickly prototyping penalty terms,
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/jolars/pengen
+BugReports: https://github.com/jolars/pengen/issues
