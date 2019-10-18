@@ -16,3 +16,5 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/jolars/pengen
 BugReports: https://github.com/jolars/pengen/issues
+Suggests: 
+    covr
