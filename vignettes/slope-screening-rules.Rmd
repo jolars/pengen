@@ -1,0 +1,63 @@
+---
+title: "Screening Rules for SLOPE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Screening Rules for SLOPE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(pengen)
+
+prob <- randomProblem(100, 10)
+
+x <- prob$x
+y <- prob$y
+
+x <- scale(x)
+y <- y - mean(y)
+
+# library(rdatasets)
+# x <- as.matrix(arcene$x)
+# y <- arcene$y
+
+system.time({
+  fit_all <- model(x, y, screening = "none", intercept = FALSE)
+})
+
+system.time({
+  fit_safe <- model(x, y, screening = "safe", intercept = FALSE)
+})
+
+system.time({
+  fit_strong <- model(x, y, screening = "strong", intercept = FALSE)
+})
+
+# violations
+safe_violations <- sum((coef(fit_all) != 0) & !fit_safe$ever_active)
+strong_violations <- sum((coef(fit_all) != 0) & !fit_strong$ever_active)
+
+# mean number of discarded predictors
+mean(apply(!fit_safe$ever_active, 2, sum))
+mean(apply(!fit_strong$ever_active, 2, sum))
+
+
+# check where the violations are ocurring
+where <- which(apply(!fit_strong$ever_active & coef(fit_all) != 0, 2, any))
+coef(fit_all)[, where]
+coef(fit_strong)[, where]
+
+# look at gradient orderings
+grad_order <- apply(coef(fit_all), 2, function(beta) {
+  order(abs(beta - t(x) %*% (y - x %*% beta)), decreasing = TRUE)
+})
+```
+

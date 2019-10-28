@@ -8,17 +8,17 @@
 #' @return Lambda_max
 #'
 #' @keywords internal
-lambdaMax <- function(object, x, y, y_scale) {
+lambdaMax <- function(family, x, y, y_scale) {
   UseMethod("lambdaMax")
 }
 
 #' @rdname lambdaMax
-lambdaMax.Gaussian <- function(object, x, y, y_scale) {
-  y_scale * max(abs(crossprod(x, y)))
+lambdaMax.Gaussian <- function(family, x, y, y_scale) {
+  y_scale * abs(crossprod(x, y))
 }
 
 #' @rdname lambdaMax
-lambdaMax.Binomial <- function(object, x, y, y_scale) {
+lambdaMax.Binomial <- function(family, x, y, y_scale) {
   # convert y from {-1, 1} to {0, 1}
   y <- (y + 1) / 2
 

@@ -25,12 +25,15 @@ model <- function(x,
                   fdr = 0.2,
                   n_penalties = 100,
                   lambda_min_ratio = ifelse(NROW(x) < NCOL(x), 0.01, 0.0001),
+                  screening = c("none", "strong", "safe"),
                   solver = "fista",
                   intercept = TRUE,
                   standardize = TRUE) {
 
   fit_intercept <- isTRUE(intercept)
   standardize <- isTRUE(standardize)
+
+  screening <- match.arg(screening)
 
   family <- switch(match.arg(family),
                    gaussian = Gaussian())
@@ -77,46 +80,79 @@ model <- function(x,
   )
 
   sigma <- penalty$sigma
-  lambda <- penalty$lambda
+  lambdas <- penalty$lambda
 
-  n_penalties <- NROW(lambda)
+  n_penalties <- NROW(lambdas)
 
-  intercepts <- array(0, c(1, m, n_penalties))
+  intercepts <- matrix(0, n_penalties, m)
   betas <- array(0, c(p, m, n_penalties))
 
   diagnostics <- vector("list", n_penalties)
 
   L <- lipschitzConstant(family, x, fit_intercept)
 
+  active_set <- seq_len(p)
+  ever_active <- matrix(FALSE, p, n_penalties)
+
   for (i in seq_len(n_penalties)) {
     if (i == 1) {
       beta <- matrix(0, p, m)
-      intercept <- matrix(0, 1, m)
+      intercept <- rep(0, m)
+
+      lambda_prev <- lambdas[i, ]
     } else {
       beta <- betas[, , i-1]
-      intercept <- intercepts[, , i-1]
+      intercept <- intercepts[i-1, ]
+
+      lambda_prev <- lambdas[i-1, ]
     }
 
-    result <- fista(x = x,
-                    y = y,
-                    lambda = lambda[i, ],
-                    family = family,
-                    penalty = penalty,
-                    intercept = intercept,
-                    beta = beta,
-                    standardize = standardize,
-                    fit_intercept = fit_intercept,
-                    L = L,
-                    eta = 2,
-                    tol_rel_gap = 1e-6,
-                    tol_infeas = 1e-6,
-                    max_passes = 1e3)
+    lambda <- lambdas[i, ]
 
-    betas[, , i] <- result$beta
-    intercepts[, , i] <- result$intercept
-    diagnostics[[i]] <- result$diagnostics
+
+    # screen features to see if they can be excluded prior to fitting
+    inactive <- screenFeatures(family,
+                               penalty,
+                               lambda,
+                               lambda_prev,
+                               x,
+                               y,
+                               beta_prev = beta,
+                               intercept_prev = as.double(intercept),
+                               method = screening)
+    active <- !inactive
+
+    # keep a set of predictors that has ever been active
+    ever_active[, i] <- ever_active[, max(i-1, 1)] | active
+
+    active_set <- which(active)
+    ever_active_set <- which(ever_active[, i])
+
+    if (any(ever_active)) {
+      result <- fista(x = x[, ever_active_set],
+                      y = y,
+                      lambda = lambdas[i, seq_along(ever_active_set)],
+                      family = family,
+                      penalty = penalty,
+                      intercept = intercept,
+                      beta = as.matrix(beta[ever_active_set]),
+                      standardize = standardize,
+                      fit_intercept = fit_intercept,
+                      L = L,
+                      eta = 2,
+                      tol_rel_gap = 1e-6,
+                      tol_infeas = 1e-6,
+                      max_passes = 1e3)
+
+      betas[ever_active_set, , i] <- result$beta
+      intercepts[i, ] <- result$intercept
+      diagnostics[[i]] <- result$diagnostics
+    } else {
+      diagnostics[[i]] <- NULL
+    }
   }
 
+  # return coefficients on original scale
   tmp <- unstandardize(intercepts,
                        betas,
                        x,
@@ -134,8 +170,9 @@ model <- function(x,
     coefficients = betas,
     intercept = intercepts,
     diagnostics = diagnostics,
-    lambda = lambda,
-    sigma = sigma
+    lambda = lambdas,
+    sigma = sigma,
+    ever_active = ever_active
   )
 
   structure(out, class = "Pengen")

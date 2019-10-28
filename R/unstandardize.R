@@ -35,8 +35,8 @@ unstandardize <- function(intercepts,
     }
 
     if (fit_intercept)
-      intercepts[, k, ] <-
-        intercepts[, k, ]*y_scale[k] + y_center[k] - x_bar_beta_sum
+      intercepts[, k] <-
+        intercepts[, k]*y_scale[k] + y_center[k] - x_bar_beta_sum
   }
 
   list(intercepts = intercepts,

@@ -17,7 +17,9 @@ LazyData: true
 URL: https://github.com/jolars/pengen
 BugReports: https://github.com/jolars/pengen/issues
 Suggests: 
-    covr
+    covr,
+    knitr,
+    rmarkdown
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
 LinkingTo: 
@@ -25,4 +27,8 @@ LinkingTo:
     RcppArmadillo
 Imports: 
     Rcpp,
-    matrixStats
+    matrixStats,
+    rdatasets (>= 0.0.0.9000)
+Remotes: 
+    jolars/rdatasets
+VignetteBuilder: knitr

@@ -5,6 +5,8 @@ preprocessFeatures <- function(x, standardize) {
     x_center <- colMeans(x)
     x_scale <- matrixStats::colSds(x)
 
+    x_scale[x_scale == 0] <- 1
+
     x <- sweep(x, 2, x_center, "-")
     x <- sweep(x, 2, x_scale, "/")
 

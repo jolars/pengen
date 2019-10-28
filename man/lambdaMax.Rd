@@ -6,20 +6,20 @@
 \alias{lambdaMax.Binomial}
 \title{Smallest L1-regularization penalty where solution is completely sparse}
 \usage{
-lambdaMax(object, x, y, y_scale)
+lambdaMax(family, x, y, y_scale)
 
-\method{lambdaMax}{Gaussian}(object, x, y, y_scale)
+\method{lambdaMax}{Gaussian}(family, x, y, y_scale)
 
-\method{lambdaMax}{Binomial}(object, x, y, y_scale)
+\method{lambdaMax}{Binomial}(family, x, y, y_scale)
 }
 \arguments{
-\item{object}{an object of class \code{"Family"}}
-
 \item{x}{feature matrix}
 
 \item{y}{response}
 
 \item{y_scale}{scale of response}
+
+\item{object}{an object of class \code{"Family"}}
 }
 \value{
 Lambda_max

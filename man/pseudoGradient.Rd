@@ -2,17 +2,19 @@
 % Please edit documentation in R/gradient.R
 \name{pseudoGradient}
 \alias{pseudoGradient}
-\title{Compute the "pseudo-gradient"}
+\title{Pseudo-Gradient}
 \usage{
-pseudoGradient(family, ...)
+pseudoGradient(family, linear_predictor, y)
 }
 \arguments{
 \item{family}{a family, such as \code{\link[=Gaussian]{Gaussian()}}}
 
-\item{...}{ignored}
+\item{linear_predictor}{linear predictor}
+
+\item{y}{response}
 }
 \value{
-Return the pseudo-gradient.
+Pseudo gradient (needs to be multiplied with X^T)
 }
 \description{
 Compute the gradient (before taking the inner product with the

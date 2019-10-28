@@ -46,12 +46,17 @@ SLOPE <- function(x,
 
     if (is.null(sigma)) {
       lambda_max <- lambdaMax(family, x, y, y_scale)
+      ord <- order(lambda_max, decreasing = TRUE)
+      min_diff_ind <- which.max(lambda_max[ord]/lambda)
 
-      sigma <- exp(seq(log(lambda_max/mean(lambda)),
-                       log(lambda_max/mean(lambda)*lambda_min_ratio),
+      lambda <- lambda*lambda_max[ord][min_diff_ind]/lambda[min_diff_ind]
+
+      sigma <- exp(seq(log(1),
+                       log(lambda_min_ratio),
                        length.out = n_penalties))
 
-      lambda <- matrix(rep(lambda, each = n_penalties, times = p), n_penalties, p)
+      lambda <- matrix(rep(lambda, each = n_penalties),
+                       n_penalties, p)
       lambda <- lambda*sigma
     }
   } else {

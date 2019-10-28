@@ -7,7 +7,8 @@
 model(x, y, family = "gaussian", penalty = "slope", sigma = NULL,
   lambda = NULL, fdr = 0.2, n_penalties = 100,
   lambda_min_ratio = ifelse(NROW(x) < NCOL(x), 0.01, 1e-04),
-  solver = "fista", intercept = TRUE, standardize = TRUE)
+  screening = c("none", "strong", "safe"), solver = "fista",
+  intercept = TRUE, standardize = TRUE)
 }
 \arguments{
 \item{x}{features}
